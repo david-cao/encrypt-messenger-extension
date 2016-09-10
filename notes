@@ -1,0 +1,31 @@
+send button: _30yy _38lh _39bl
+like button: _4rv9 _30yy _39bl
+
+react node ids change peruser, cannot use these
+
+workflow
+
+register:
+- generate key pair on machine
+- send public through chat bot
+- chat bot uploads userid, public key as a key value
+    - need to ensure request is coming from chat bot somehow
+
+usage:
+- provide local path to private key
+- On message send, if using encryption, intercept message
+    - Add on enter pressed BEFORE react calls
+- encrypt with private key
+- send ciphertext instead
+    - simply replace the text before the call ends, should fallthrough to react call to send message
+
+two ways to decrypt
+easier:
+- have button to decrypt all messages
+harder:
+- on a new message (how to do this?) decrypt
+
+challenges:
+- get userid (not too hard)
+- nicely hooking into react to get control of enter button
+    - previously used alt, can we fix this?
