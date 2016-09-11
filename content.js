@@ -36,17 +36,21 @@ var injectme = function() {
     input.publicInstance._resetState();
   };
 
+  // Create a DOM listener that observes when the user changes conversations and updates window.friendfbid.
   var config = {attributes: true, subtree: true};
   var target = document.getElementsByClassName('_48e9').item(0);
   var observer = new MutationObserver(function(muts) {
+    var oldId = window.friendfbid;
     muts.forEach(function(mut) {
       if (mut.attributeName == 'aria-relevant') {
-        console.log(mut);
+        var id = mut.target.firstChild.id.split(':')[1];
+        if (id != oldId) {
+          window.friendfbid = id;
+          console.log('Changed id to: ' + id);
+        }
       }
     });
   });
-  console.log(target);
-
   observer.observe(target, config);
 }
 
