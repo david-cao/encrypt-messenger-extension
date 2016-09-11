@@ -1,9 +1,8 @@
-// ensure we have a flag to use to track lock
-document.addEventListener('beforeload', function() {
-  if (!window.localStorage.getItem('useEncryption')) {
-    window.localStorage.useEncryption = false + '';
-  }
-});
+var generateKeys = function() {
+  chrome.tabs.sendMessage(tabs[0].id, {greeting: "generateKeys"}, function(response) {
+    console.log(response.farewell);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   var link = document.getElementById('lock');
@@ -36,3 +35,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+

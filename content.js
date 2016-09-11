@@ -107,11 +107,26 @@ var injectme = function() {
         var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
         for (var i = 0; i < msgWrapperNodes.length; i++) {
           var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-          //console.log(msgNode.innerHTML);
+          msgNode.innerHTML = decrypt(msgNode.innerHTML);
         }
       }
     });
   };
+
+  var decrypt = function(c) {
+    var pubkey = window.pubkey;
+    var privkey; // FIX THIS
+
+    options = {
+        message: window.openpgp.message.readArmored(c),     // parse armored message
+        publicKeys: window.openpgp.key.readArmored(pubkey).keys,    // for verification (optional)
+        privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
+    };
+
+    window.openpgp.decrypt(options).then(function(plaintext) {
+      return plaintext.data;
+    });
+  }
 
   var setUpDecryption = function() {
     attachMsgObserver();
@@ -145,21 +160,6 @@ var findMessages = function() {
     }
   });
 };
-
-var decrypt = function(c) {
-  var pubkey = window.pubkey;
-  var privkey; // FIX THIS
-
-  options = {
-      message: window.openpgp.message.readArmored(c),     // parse armored message
-      publicKeys: window.openpgp.key.readArmored(pubkey).keys,    // for verification (optional)
-      privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
-  };
-
-  window.openpgp.decrypt(options).then(function(plaintext) {
-    return plaintext.data;
-  });
-}
 
 window.onload = function() {
   console.log("loading shit");
