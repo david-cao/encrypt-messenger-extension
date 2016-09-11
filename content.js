@@ -30,8 +30,8 @@ var injectme = function() {
   window.userfbid = window.composer.props.viewer;
   window.friendfbid = window.composer.props.threadFBID;
 
-  var f = composer.publicInstance._handleMessageSend.bind(composer.publicInstance);
-  composer.publicInstance._handleMessageSend = function(p, q) {
+  var f = window.composer.publicInstance._handleMessageSend.bind(window.composer.publicInstance);
+  window.composer.publicInstance._handleMessageSend = function(p, q) {
     
     var options, encrypted;
 
@@ -48,8 +48,21 @@ var injectme = function() {
         encrypted = ciphertext.data; // '-----BEGIN PGP MESSAGE ... END PGP MESSAGE-----'
     });
 
-    f(encrypted + '- hacked!!', q);
-    input.publicInstance._resetState();
+    f(encrypted, q);
+    window.input.publicInstance._resetState();
+  };
+
+  var findMessages = function() {
+    var containerNode = document.getElementById('js_2');
+    containerNode.childNodes.forEach(function(child) {
+      if (child.tagName == 'DIV') {
+        var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
+        for (var i = 0; i < msgWrapperNodes.length; i++) {
+          var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
+          console.log(msgNode.innerHTML);
+        }
+      }
+    });
   };
 
   // Create a DOM listener that observes when the user changes conversations and updates window.friendfbid.
@@ -76,24 +89,11 @@ var injectme = function() {
   setTimeout(findMessages, 1000);
 }
 
-var findMessages = function() {
-  var containerNode = document.getElementById('js_2');
-  containerNode.childNodes.forEach(function(child) {
-    if (child.tagName == 'DIV') {
-      var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
-      for (var i = 0; i < msgWrapperNodes.length; i++) {
-        var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-        console.log(msgNode);
-      }
-    }
-  });
-};
-
 var inject = function() {
 
-  var openpgp = document.createElement('script');
-  openpgp.src = chrome.extension.getURL('openpgp.js');
-  document.head.appendChild(openpgp);
+  var openpgpscript = document.createElement('script');
+  openpgpscript.src = chrome.extension.getURL('openpgp.js');
+  document.head.appendChild(openpgpscript);
 
   var injectionString = '(' + injectme.toString() + ')();';
   var script = document.createElement('script');
@@ -101,8 +101,32 @@ var inject = function() {
   document.head.appendChild(script);
 }
 
-var decrypt = function() {
+var findMessages = function() {
+  var containerNode = document.getElementById('js_2');
+  containerNode.childNodes.forEach(function(child) {
+    if (child.tagName == 'DIV') {
+      var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
+      for (var i = 0; i < msgWrapperNodes.length; i++) {
+        var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
+        msgNode.innerHTML = decrypt(msgNode.innerHTML);
+      }
+    }
+  });
+};
 
+var decrypt = function(c) {
+  var pubkey = window.pubkey;
+  var privkey; // FIX THIS
+
+  options = {
+      message: window.openpgp.message.readArmored(c),     // parse armored message
+      publicKeys: window.openpgp.key.readArmored(pubkey).keys,    // for verification (optional)
+      privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
+  };
+
+  window.openpgp.decrypt(options).then(function(plaintext) {
+    return plaintext.data;
+  });
 }
 
 window.onload = function() {
