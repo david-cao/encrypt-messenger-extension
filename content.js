@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 var injectme = function() {
   var getPubKey = function(fbid) {
     console.log('getting pub key');
-    chrome.runtime.sendMessage("kedjnloabfgpcolamangobmhmedjfkkh", {greeting: "fbid", fbid: fbid}, function(response) {
+    chrome.runtime.sendMessage(window.localStorage.getItem('encrypted-messenger-id'), {greeting: "fbid", fbid: fbid}, function(response) {
       console.log(response);
       console.log(response.pubkey);
       window.pubkey = response.pubkey;
@@ -66,19 +66,6 @@ var injectme = function() {
     });
   };
 
-  var findMessages = function() {
-    var containerNode = document.getElementById('js_2');
-    containerNode.childNodes.forEach(function(child) {
-      if (child.tagName == 'DIV') {
-        var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
-        for (var i = 0; i < msgWrapperNodes.length; i++) {
-          var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-          console.log(msgNode.innerHTML);
-        }
-      }
-    });
-  };
-
   // Creates DOM listener to observe when the user changes conversations and updates window.friendfbid.
   var config = {attributes: true, subtree: true};
   var target = document.getElementsByClassName('_48e9').item(0);
@@ -101,7 +88,7 @@ var injectme = function() {
 
   // Creates DOM listener to observe when user scrolls up in the msg window.
   var attachMsgObserver = function() {
-    var target = document.getElementById('js_2');
+    var target = document.getElementsByClassName('__i_')[0];
     var config = {attributes: true, subtree: true};
     var msgObserver = new MutationObserver(function(muts) {
       // This is ratchet. Prevents callback from firing if time bubble appears on user messages
@@ -115,15 +102,18 @@ var injectme = function() {
 
   // Grabs msg text and decrypts it
   var findMessages = function() {
-    console.log('Getting the msgs');
-    var containerNode = document.getElementById('js_2');
+    var containerNode = document.getElementsByClassName('__i_')[0];
     containerNode.childNodes.forEach(function(child) {
-      if (child.tagName == 'DIV') {
-        var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
-        for (var i = 0; i < msgWrapperNodes.length; i++) {
-          var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-          msgNode.innerHTML = decrypt(msgNode.innerHTML, msgNode);
-        }
+      if (child.tagName == 'DIV' && child.id.length > 0) {
+        child.childNodes.forEach(function(c) {
+          if (c.tagName == 'DIV') {
+            var msgWrapperNodes = c.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
+            for (var i = 0; i < msgWrapperNodes.length; i++) {
+              var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
+              msgNode.innerHTML = decrypt(msgNode.innerHTML, msgNode);
+            }
+          }
+        });
       }
     });
   };
@@ -169,19 +159,6 @@ var inject = function() {
   script.textContent = injectionString;
   document.head.appendChild(script);
 }
-
-var findMessages = function() {
-  var containerNode = document.getElementById('js_2');
-  containerNode.childNodes.forEach(function(child) {
-    if (child.tagName == 'DIV') {
-      var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
-      for (var i = 0; i < msgWrapperNodes.length; i++) {
-        var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-        msgNode.innerHTML = decrypt(msgNode.innerHTML);
-        }
-    }
-  });
-};
 
 window.onload = function() {
   setTimeout(inject, 1000);
