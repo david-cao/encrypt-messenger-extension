@@ -22,7 +22,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 });
 
 var injectme = function() {
-
   var getPubKey = function(fbid) {
     console.log('getting pub key');
     chrome.runtime.sendMessage("kedjnloabfgpcolamangobmhmedjfkkh", {greeting: "fbid", fbid: fbid}, function(response) {
@@ -57,7 +56,7 @@ var injectme = function() {
 
     options = {
         data: p,                             // input as String (or Uint8Array)
-        publicKeys: window.openpgp.key.readArmored(pubkey).keys,  // for encryption
+        publicKeys: [window.openpgp.key.readArmored(pubkey).keys[0], window.openpgp.key.readArmored(window.localStorage.getItem('privateKey')).keys[0]],  // for encryption
     };
 
     window.openpgp.encrypt(options).then(function(ciphertext) {
