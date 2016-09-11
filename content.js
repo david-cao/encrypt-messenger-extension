@@ -31,8 +31,24 @@ var injectme = function() {
   window.friendfbid = window.composer.props.threadFBID;
 
   var f = composer.publicInstance._handleMessageSend.bind(composer.publicInstance);
-  composer.publicInstance._handleMessageSend = function(p, q) { 
-    f(p + '- hacked!!', q);
+  composer.publicInstance._handleMessageSend = function(p, q) {
+    
+    var options, encrypted;
+
+    var pubkey = '-----BEGIN PGP PUBLIC KEY BLOCK ... END PGP PUBLIC KEY BLOCK-----';
+    var privkey = '-----BEGIN PGP PRIVATE KEY BLOCK ... END PGP PRIVATE KEY BLOCK-----';
+
+    options = {
+        data: p,                             // input as String (or Uint8Array)
+        publicKeys: window.openpgp.key.readArmored(pubkey).keys,  // for encryption
+        privateKeys: window.openpgp.key.readArmored(privkey).keys // for signing (optional)
+    };
+
+    window.openpgp.encrypt(options).then(function(ciphertext) {
+        encrypted = ciphertext.data; // '-----BEGIN PGP MESSAGE ... END PGP MESSAGE-----'
+    });
+
+    f(encrypted + '- hacked!!', q);
     input.publicInstance._resetState();
   };
 
@@ -74,12 +90,19 @@ var findMessages = function() {
 };
 
 var inject = function() {
-  var injectionString = '(' + injectme.toString() + ')();';
 
+  var openpgp = document.createElement('script');
+  openpgp.src = chrome.extension.getURL('openpgp.js');
+  document.head.appendChild(openpgp);
+
+  var injectionString = '(' + injectme.toString() + ')();';
   var script = document.createElement('script');
   script.textContent = injectionString;
+  document.head.appendChild(script);
+}
 
-  document.body.appendChild(script);
+var decrypt = function() {
+
 }
 
 window.onload = function() {
