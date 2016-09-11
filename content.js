@@ -52,7 +52,26 @@ var injectme = function() {
     });
   });
   observer.observe(target, config);
+
+  // Creates DOM listener to observe when user scrolls up in the msg window.
+  
+
+  // Need to fix this. Supposed to decrypt the messages
+  setTimeout(findMessages, 1000);
 }
+
+var findMessages = function() {
+  var containerNode = document.getElementById('js_2');
+  containerNode.childNodes.forEach(function(child) {
+    if (child.tagName == 'DIV') {
+      var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
+      for (var i = 0; i < msgWrapperNodes.length; i++) {
+        var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
+        console.log(msgNode);
+      }
+    }
+  });
+};
 
 var inject = function() {
   var injectionString = '(' + injectme.toString() + ')();';
@@ -65,5 +84,6 @@ var inject = function() {
 
 window.onload = function() {
   console.log("loading shit");
-  inject();
+  setTimeout(inject, 1000);
+  //inject();
 }
