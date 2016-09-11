@@ -142,16 +142,7 @@ var injectme = function() {
     findMessages();
   };
 
-  var repeater = function() {
-    console.log('ayo');
-    findMessages();
-    setTimeout(repeater, 1500);
-  }
-
-  setTimeout(function() {
-    setUpDecryption();
-    // repeater(); 
-  }, 1000);
+  setTimeout(setUpDecryption, 1000);
 }
 
 var inject = function() {
