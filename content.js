@@ -36,16 +36,18 @@ var injectme = function() {
     input.publicInstance._resetState();
   };
 
-  // var observer = new MutationObserver(function(muts) {
-  //   muts.forEach(function(m) {
-  //     console.log(m.type);
-  //   });
-  // });
-  // var config = {subtree: true};
-  // var target = document.getElementsByClassName('_48e9');
-  // console.log(target);
+  var config = {attributes: true, subtree: true};
+  var target = document.getElementsByClassName('_48e9').item(0);
+  var observer = new MutationObserver(function(muts) {
+    muts.forEach(function(mut) {
+      if (mut.attributeName == 'aria-relevant') {
+        console.log(mut);
+      }
+    });
+  });
+  console.log(target);
 
-  // observer.observe(target, config);
+  observer.observe(target, config);
 }
 
 var inject = function() {
