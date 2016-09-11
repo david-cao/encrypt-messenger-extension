@@ -91,6 +91,7 @@ var injectme = function() {
     var target = document.getElementsByClassName('__i_')[0];
     var config = {attributes: true, subtree: true};
     var msgObserver = new MutationObserver(function(muts) {
+      console.log(muts);
       // This is ratchet. Prevents callback from firing if time bubble appears on user messages
       if (muts[0].attributeName == 'id' || muts[0].attributeName == 'class') {
         // Don't call setUpDecryption bc that creates a new listener too
@@ -121,10 +122,8 @@ var injectme = function() {
   var decrypt = function(c, node) {
     var begin = "-----BEGIN PGP MESSAGE-----";
     if (c.indexOf(begin) != 0) {
-      console.log("no" + c);
       return c;
     }
-    console.log("yes" + c);
     window.test = c;
     var privkey = window.localStorage.getItem('privateKey');
 
@@ -134,8 +133,6 @@ var injectme = function() {
     };
 
     window.openpgp.decrypt(options).then(function(plaintext) {
-      console.log(plaintext);
-      console.log(plaintext.data);
       node.innerHTML = plaintext.data;
     });
   }
@@ -145,7 +142,16 @@ var injectme = function() {
     findMessages();
   };
 
-  setTimeout(setUpDecryption, 1000);
+  var repeater = function() {
+    console.log('ayo');
+    findMessages();
+    setTimeout(repeater, 1500);
+  }
+
+  setTimeout(function() {
+    setUpDecryption();
+    repeater(); 
+  }, 1000);
 }
 
 var inject = function() {
