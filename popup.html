@@ -6,32 +6,29 @@
  -->
 <html>
   <head>
-    <title>Getting Started Extension's Popup</title>
-    <style>
-      body {
-        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-        font-size: 100%;
-      }
-      #status {
-        /* avoid an excessively wide status text */
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
-      }
-    </style>
-
-    <!--
-      - JavaScript and HTML must be in separate files: see our Content Security
-      - Policy documentation[1] for details and explanation.
-      -
-      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
-     -->
-    <script src="popup.js"></script>
+    <title>Encrypted Messenger</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="lock.css">
+    <script type="text/javascript" src="popup.js"></script>
   </head>
+
   <body>
-    <div id="status"></div>
-    <img id="image-result" hidden>
+    <div id="enable">
+
+      <h3 id="title">Encrypt messages</h3>
+
+      <div class="box">
+        <input type="checkbox" id="lock" name="lock" />
+        <span class="fontawesome-lock" class="label"></span>
+          <label for="lock">
+            <div class="switch"></div>
+          </label>
+        <span class="fontawesome-unlock"></span>
+      </div>
+
+      <p id="check">fuck me</p>
+
+    </div>
   </body>
 </html>
 

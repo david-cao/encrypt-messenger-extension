@@ -14,10 +14,25 @@ register:
 usage:
 - provide local path to private key
 - On message send, if using encryption, intercept message
-    - Add on enter pressed BEFORE react calls
-- encrypt with private key
+- encrypt with public key
 - send ciphertext instead
     - simply replace the text before the call ends, should fallthrough to react call to send message
+
+- when messenger is opened, if lock is enabled we do start up stuff
+- when lock is switched on, we also do start up stuff
+- when lock is disabled, refresh page (?)
+
+start up stuff
+- inject code to catch messages and encrypt (see below)
+    - includes openPGP code
+- decrypt any messages on screen
+
+injection code
+- hook into enter button to catch messages before sending (DONE)
+- grab user fbid and chatter fbid (IGNORE GROUPS)
+    - async call to fetch public key
+    - Regrab on new message select
+
 
 two ways to decrypt
 easier:

@@ -1,0 +1,93 @@
+/*taken from http://cssdeck.com/labs/lock-switches*/
+
+@import url(http://weloveiconfonts.com/api/?family=fontawesome);
+
+/* entypo */
+[class*="fontawesome-"]:before {
+  font-family: 'fontawesome', sans-serif;
+}
+
+::selection {background:transparent;}
+
+.box {
+  width:121px;
+  height:50px;
+  margin:0px auto 0px auto;
+}
+input[type="checkbox"]{display:none;}
+
+label[for="lock"] {
+  float:left;
+  display:block;
+  width:60px;
+  height:20px;
+  padding:3px;
+  margin:0px 10px;
+  border-radius:30px;
+  background:rgba(0,0,0,.1);
+  box-shadow:inset 0 2px 10px #666,
+    0 2px 5px #eee;
+}
+
+label[for="lock_one"] {
+  float:left;
+  display:block;
+  width:60px;
+  height:20px;
+  padding:3px;
+  margin:0px 10px;
+  border-radius:30px;
+  background:rgba(0,0,0,.1);
+  box-shadow:inset 0 2px 10px #666,
+    0 2px 5px #eee;
+}
+
+.switch {
+  display:block;
+  width:10px;
+  height:10px;
+  padding:5px;
+  background:#eee;
+  box-shadow:inset 0 0 5px rgba(255, 165, 0,0.25),
+    0 0 5px #888;
+  border-radius:20px;
+  -webkit-transition:.3s;
+  -moz-transition:.3s;
+  -o-transition:.3s;
+  transition:.3s;
+
+}
+
+.switch:after {
+  content:'';
+  display:block;
+  margin:0;
+  width:10px;
+  height:10px;
+  background:#ffa500;
+  border-radius:8px;
+  box-shadow:inset 0 0 3px #555;
+}
+
+input[type="checkbox"]:not(:checked) ~ label[for="lock"] .switch {margin-left:40px;}
+
+input[type="checkbox"]:not(:checked) ~ label[for="lock_one"] .switch {margin-left:40px;}
+
+span[class*="fontawesome"] {
+  color:rgba(0,0,0,0.15);
+  float:left;
+   font-size:22px;
+  line-height:26px;
+}
+span[class="fontawesome-lock"] {}
+span[class="fontawesome-unlock"] {}
+input[type="checkbox"]:checked ~ span[class="fontawesome-lock"] {
+  color:rgba(255, 165, 0,0.65);
+  text-shadow:0 0 3px #CFCFCF,
+    0 -1px 2px rgba(255, 165, 0,.5),
+    0 0 3px #CFCFCF;} 
+input[type="checkbox"]:not(:checked) ~ span[class="fontawesome-unlock"] {
+  color:rgba(255, 165, 0,0.65);
+  text-shadow:0 0 3px #CFCFCF,
+    0 -1px 2px rgba(255, 165, 0,.5),
+    0 0 3px #CFCFCF;} 
