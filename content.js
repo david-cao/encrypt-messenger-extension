@@ -65,10 +65,10 @@ var injectme = function() {
     });
   };
 
-  // Create a DOM listener that observes when the user changes conversations and updates window.friendfbid.
+  // Creates DOM listener to observe when the user changes conversations and updates window.friendfbid.
   var config = {attributes: true, subtree: true};
   var target = document.getElementsByClassName('_48e9').item(0);
-  var observer = new MutationObserver(function(muts) {
+  var conversationObserver = new MutationObserver(function(muts) {
     var oldId = window.friendfbid;
     muts.forEach(function(mut) {
       if (mut.attributeName == 'aria-relevant') {
@@ -76,17 +76,49 @@ var injectme = function() {
         if (id != oldId) {
           window.friendfbid = id;
           console.log('Changed id to: ' + id);
+          // Must decrypt new messages
+          setTimeout(setUpDecryption, 1000);
         }
       }
     });
   });
-  observer.observe(target, config);
+  conversationObserver.observe(target, config);
 
   // Creates DOM listener to observe when user scrolls up in the msg window.
-  
+  var attachMsgObserver = function() {
+    var target = document.getElementById('js_2');
+    var config = {attributes: true, subtree: true};
+    var msgObserver = new MutationObserver(function(muts) {
+      // This is ratchet. Prevents callback from firing if time bubble appears on user messages
+      if (muts[0].attributeName == 'id' || muts[0].attributeName == 'class') {
+        // Don't call setUpDecryption bc that creates a new listener too
+        findMessages();
+      }
+    });
+    msgObserver.observe(target, config);
+  };
 
-  // Need to fix this. Supposed to decrypt the messages
-  setTimeout(findMessages, 1000);
+  // Grabs msg text and decrypts it
+  var findMessages = function() {
+    console.log('Getting the msgs');
+    var containerNode = document.getElementById('js_2');
+    containerNode.childNodes.forEach(function(child) {
+      if (child.tagName == 'DIV') {
+        var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
+        for (var i = 0; i < msgWrapperNodes.length; i++) {
+          var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
+          //console.log(msgNode.innerHTML);
+        }
+      }
+    });
+  };
+
+  var setUpDecryption = function() {
+    attachMsgObserver();
+    findMessages();
+  };
+
+  setTimeout(setUpDecryption, 1000);
 }
 
 var inject = function() {
@@ -109,7 +141,7 @@ var findMessages = function() {
       for (var i = 0; i < msgWrapperNodes.length; i++) {
         var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
         msgNode.innerHTML = decrypt(msgNode.innerHTML);
-      }
+        }
     }
   });
 };
