@@ -150,7 +150,7 @@ var injectme = function() {
 
   setTimeout(function() {
     setUpDecryption();
-    repeater(); 
+    // repeater(); 
   }, 1000);
 }
 
