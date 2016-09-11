@@ -1,0 +1,59 @@
+//***on opening app for first time***
+
+var openpgp = require('openpgp'); 
+
+openpgp.initWorker({ path:'openpgp.worker.js' })
+openpgp.config.aead_protect = true
+
+
+var options = {
+    userIds: [{ name:'Jon Smith', email:'jon@example.com' }], //this will need to be changed
+    numBits: 4096,
+    passphrase: 'super long and hard to guess secret' //this will need to be changed
+};
+
+openpgp.generateKey(options).then(function(key) {
+    var privkey = key.privateKeyArmored;
+    var pubkey = key.publicKeyArmored;
+    //[local storage or file system - save privkey]
+    //[server - upload public key to server]
+});
+
+//***on sending message***
+
+var options;
+var encrypted;
+var pubkey;
+var privkey;
+var message;
+//[local storage or file system - get privkey]
+//[server / react - upload public key to server]
+//[react - pull message from input text box]
+
+options = {
+    data: message,
+    publicKeys: openpgp.key.readArmored(pubkey).keys,
+    privateKeys: openpgp.key.readArmored(privkey).keys
+};
+
+openpgp.encrypt(options).then(function(ciphertext) { //[react - code to pull message from input text box]
+});
+
+//***on receiving message***
+
+var options;
+var encrypted;
+var pubkey;
+var privkey;
+//[local storage or file system - get privkey]
+//[server / react - upload public key to server]
+options = {
+    message: openpgp.message.readArmored(encrypted),     // parse armored message
+    publicKeys: openpgp.key.readArmored(pubkey).keys,    // for verification (optional)
+    privateKey: openpgp.key.readArmored(privkey).keys[0] // for decryption
+};
+
+openpgp.decrypt(options).then(function(plaintext) {
+    return plaintext.data; //[react - put message in chat conversation]
+});
+
