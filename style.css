@@ -17,8 +17,6 @@ body {
   /*white-space: pre;*/
   text-overflow: ellipsis;
   overflow: hidden;
-  height: 200px;
   width: 200px;
-  max-height: 200px;
   max-width: 200px;
 }

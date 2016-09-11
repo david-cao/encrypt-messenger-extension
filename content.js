@@ -1,22 +1,28 @@
-console.log("waddup");
-console.log("lock: " + window.localStorage.useEncryption);
+console.log('Initializing Encrypted Messenger');
 
 // listen from switch
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-  console.log(sender.tab ?
-    "from a content script:" + sender.tab.url :
-    "from the extension");
-  if (msg.greeting === "checked") {
-    console.log("yep");
-    inject();
-  } else {
-    console.log("nope");
+  console.log(msg);
+  if (msg.greeting === 'generateKeys') {
+    var options = {
+        userIds: [{ name:'Jon Smith', email:'jon@example.com' }], // multiple user IDs
+        numBits: 2048,                                            // RSA key size
+        passphrase: 'super long and hard to guess secret'         // protects the private key
+    };
+
+    openpgp.generateKey(options).then(function(key) {
+        var privkey = key.privateKeyArmored; // '-----BEGIN PGP PRIVATE KEY BLOCK ... '
+        var pubkey = key.publicKeyArmored;   // '-----BEGIN PGP PUBLIC KEY BLOCK ... '
+        window.localStorage.setItem('privateKey', privkey);
+        sendResponse({pub: pubkey});
+    });
   }
+  return true;
 });
 
 var injectme = function() {
-  console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
-  console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent);
+  // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent);
   var elementData = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.elementData.values(); 
   var elts = []; var done = false;
   while (!done) {
@@ -115,7 +121,7 @@ var injectme = function() {
 
   var decrypt = function(c) {
     var pubkey = window.pubkey;
-    var privkey; // FIX THIS
+    var privkey = window.localStorage.getItem('privateKey'); // FIX THIS
 
     options = {
         message: window.openpgp.message.readArmored(c),     // parse armored message
@@ -162,7 +168,6 @@ var findMessages = function() {
 };
 
 window.onload = function() {
-  console.log("loading shit");
   setTimeout(inject, 1000);
   //inject();
 }
