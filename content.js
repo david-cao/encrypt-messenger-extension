@@ -1,4 +1,6 @@
 console.log('Initializing Encrypted Messenger');
+window.localStorage.setItem('encrypted-messenger-id', chrome.runtime.id);
+console.log(window.localStorage.getItem('encrypted-messenger-id'));
 
 // listen from switch
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
@@ -23,10 +25,12 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 var injectme = function() {
 
   var getPubKey = function(fbid) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", 'https://encrypted-messenger.me/get/' + fbid, false); // false for synchronous request
-    xmlHttp.send( null );
-    window.pubkey = xmlHttp.responseText;
+    console.log('getting pub key');
+    chrome.runtime.sendMessage("kedjnloabfgpcolamangobmhmedjfkkh", {greeting: "fbid", fbid: fbid}, function(response) {
+      console.log(response);
+      console.log(response.pubkey);
+      window.pubkey = response.pubkey;
+    });
   }
 
   // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
@@ -36,7 +40,7 @@ var injectme = function() {
   while (!done) {
     var iter = elementData.next();
     done = iter.done;   
-    elts.push(iter.value); 
+    elts.push(iter.value);
   };
 
   window.composer = elts.filter(function(elt) {return elt != null && elt.name==="MessengerComposer";})[0];
@@ -50,21 +54,18 @@ var injectme = function() {
     
     var options, encrypted;
 
-    var pubkey = '-----BEGIN PGP PUBLIC KEY BLOCK ... END PGP PUBLIC KEY BLOCK-----';
-    var privkey = window.localStorage.getItem('privateKey');
+    var pubkey = window.pubkey;
 
     options = {
         data: p,                             // input as String (or Uint8Array)
         publicKeys: window.openpgp.key.readArmored(pubkey).keys,  // for encryption
-        privateKeys: window.openpgp.key.readArmored(privkey).keys // for signing (optional)
     };
 
     window.openpgp.encrypt(options).then(function(ciphertext) {
         encrypted = ciphertext.data; // '-----BEGIN PGP MESSAGE ... END PGP MESSAGE-----'
+        f(encrypted, q);
+        window.input.publicInstance._resetState();
     });
-
-    f(encrypted, q);
-    window.input.publicInstance._resetState();
   };
 
   var findMessages = function() {
@@ -130,12 +131,11 @@ var injectme = function() {
   };
 
   var decrypt = function(c) {
-    var pubkey = window.pubkey;
-    var privkey = window.localStorage.getItem('privateKey'); // FIX THIS
+    var begin = "-----BEGIN PGP MESSAGE-----";
+    var privkey = window.localStorage.getItem('privateKey');
 
     options = {
         message: window.openpgp.message.readArmored(c),     // parse armored message
-        publicKeys: window.openpgp.key.readArmored(pubkey).keys,    // for verification (optional)
         privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
     };
 

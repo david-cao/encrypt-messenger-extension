@@ -11,8 +11,16 @@
   "permissions": [
     "activeTab",
     "tabs",
+    "webRequest",
+    "webRequestBlocking",
     "storage"
   ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "externally_connectable": {
+    "matches": ["https://www.messenger.com/*"]
+  },
   "content_scripts": [
     {
       "matches": ["https://www.messenger.com/*"],
