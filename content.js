@@ -124,14 +124,19 @@ var injectme = function() {
         var msgWrapperNodes = child.childNodes[0].getElementsByClassName('_41ud')[0].getElementsByClassName('clearfix');
         for (var i = 0; i < msgWrapperNodes.length; i++) {
           var msgNode = msgWrapperNodes[i].childNodes[0].childNodes[0];
-          msgNode.innerHTML = decrypt(msgNode.innerHTML);
+          msgNode.innerHTML = decrypt(msgNode.innerHTML, msgNode);
         }
       }
     });
   };
 
-  var decrypt = function(c) {
+  var decrypt = function(c, node) {
     var begin = "-----BEGIN PGP MESSAGE-----";
+    if (c.indexOf(begin) != 0) {
+      console.log("no" + c);
+      return c;
+    }
+    console.log("yes" + c);
     var privkey = window.localStorage.getItem('privateKey');
 
     options = {
@@ -140,7 +145,7 @@ var injectme = function() {
     };
 
     window.openpgp.decrypt(options).then(function(plaintext) {
-      return plaintext.data;
+      node.innerHTML = plaintext.data;
     });
   }
 
