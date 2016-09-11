@@ -8,8 +8,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.greeting === 'generateKeys') {
     var options = {
         userIds: [{ name:'Jon Smith', email:'jon@example.com' }], // multiple user IDs
-        numBits: 2048,                                            // RSA key size
-        passphrase: 'super long and hard to guess secret'         // protects the private key
+        numBits: 2048                                            // RSA key size
     };
 
     openpgp.generateKey(options).then(function(key) {
@@ -137,14 +136,17 @@ var injectme = function() {
       return c;
     }
     console.log("yes" + c);
+    window.test = c;
     var privkey = window.localStorage.getItem('privateKey');
 
     options = {
-        message: window.openpgp.message.readArmored(c),     // parse armored message
-        privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
+      message: window.openpgp.message.readArmored(c),     // parse armored message
+      privateKey: window.openpgp.key.readArmored(privkey).keys[0] // for decryption
     };
 
     window.openpgp.decrypt(options).then(function(plaintext) {
+      console.log(plaintext);
+      console.log(plaintext.data);
       node.innerHTML = plaintext.data;
     });
   }
