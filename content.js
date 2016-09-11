@@ -1,5 +1,4 @@
-console.log("waddup");
-console.log("lock: " + window.localStorage.useEncryption);
+console.log('Initializing Encrypted Messenger');
 
 // listen from switch
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
@@ -15,8 +14,8 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 });
 
 var injectme = function() {
-  console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
-  console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent);
+  // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent);
   var elementData = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.elementData.values(); 
   var elts = []; var done = false;
   while (!done) {
@@ -162,7 +161,6 @@ var decrypt = function(c) {
 }
 
 window.onload = function() {
-  console.log("loading shit");
   setTimeout(inject, 1000);
   //inject();
 }
