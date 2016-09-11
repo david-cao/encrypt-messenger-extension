@@ -3,11 +3,14 @@ var generateKeys = function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {greeting: "generateKeys"}, function(res) {
       document.getElementById('info').hidden = false;
-      document.getElementById('scroll').hidden = false;
-      document.getElementById('publickey').hidden = false;
-      document.getElementById('publickey').value = res.pub;
-      document.getElementById('publickey').select();
+      // document.getElementById('scroll').hidden = false;
+      // document.getElementById('publickey').value = res.pub;
+      // document.getElementById('publickey').select();
       copyTextToClipboard(res.pub);
+      window.localStorage.setItem('haskeypair', 'true');
+
+      gen.disabled = true;
+      gen.innerHTML = "Key pair exists!";
     });
   });
 }
@@ -58,6 +61,23 @@ document.addEventListener('DOMContentLoaded', function() {
   var gen = document.getElementById('generate');
 
   gen.addEventListener('click', generateKeys);
+
+  // a tags will open in new tab
+  var links = document.getElementsByTagName("a");
+  for (var i = 0; i < links.length; i++) {
+    (function () {
+      var ln = links[i];
+      var location = ln.href;
+      ln.onclick = function () {
+        chrome.tabs.create({active: true, url: location});
+      };
+    })();
+  }
+
+  if (window.localStorage.getItem('haskeypair') === 'true') {
+    gen.disabled = true;
+    gen.innerHTML = "Key pair exists!";
+  }
 
   // link.checked = window.localStorage.useEncryption === 'true';
   // chrome.tabs.sendMessage(tabs[0].id, {greeting: "checked"}, function(response) {

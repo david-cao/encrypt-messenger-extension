@@ -21,6 +21,14 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 });
 
 var injectme = function() {
+
+  var getPubKey = function(fbid) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", 'https://encrypted-messenger.me/get/' + fbid, false); // false for synchronous request
+    xmlHttp.send( null );
+    window.pubkey = xmlHttp.responseText;
+  }
+
   // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__);
   // console.log(__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent);
   var elementData = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.elementData.values(); 
@@ -35,6 +43,7 @@ var injectme = function() {
   window.input = elts.filter(function(elt) {return elt != null && elt.name==="MessengerInput";})[0];
   window.userfbid = window.composer.props.viewer;
   window.friendfbid = window.composer.props.threadFBID;
+  getPubKey(window.friendfbid);
 
   var f = window.composer.publicInstance._handleMessageSend.bind(window.composer.publicInstance);
   window.composer.publicInstance._handleMessageSend = function(p, q) {
@@ -42,7 +51,7 @@ var injectme = function() {
     var options, encrypted;
 
     var pubkey = '-----BEGIN PGP PUBLIC KEY BLOCK ... END PGP PUBLIC KEY BLOCK-----';
-    var privkey = '-----BEGIN PGP PRIVATE KEY BLOCK ... END PGP PRIVATE KEY BLOCK-----';
+    var privkey = window.localStorage.getItem('privateKey');
 
     options = {
         data: p,                             // input as String (or Uint8Array)
@@ -81,6 +90,7 @@ var injectme = function() {
         var id = mut.target.firstChild.id.split(':')[1];
         if (id != oldId) {
           window.friendfbid = id;
+          getPubKey(window.friendfbid);
           console.log('Changed id to: ' + id);
           // Must decrypt new messages
           setTimeout(setUpDecryption, 1000);
